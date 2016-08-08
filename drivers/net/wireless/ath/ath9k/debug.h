@@ -24,7 +24,7 @@ struct ath_txq;
 struct ath_buf;
 struct fft_sample_tlv;
 
-#ifdef CONFIG_ATH9K_DEBUGFS
+#ifdef CPTCFG_ATH9K_DEBUGFS
 #define TX_STAT_INC(q, c) sc->debug.stats.txstats[q].c++
 #define RX_STAT_INC(c) (sc->debug.stats.rxstats.c++)
 #define RESET_STAT_INC(sc, type) sc->debug.stats.reset[type]++
@@ -50,10 +50,12 @@ enum ath_reset_type {
 	RESET_TYPE_BEACON_STUCK,
 	RESET_TYPE_MCI,
 	RESET_TYPE_CALIBRATION,
+	RESET_TX_DMA_ERROR,
+	RESET_RX_DMA_ERROR,
 	__RESET_TYPE_MAX
 };
 
-#ifdef CONFIG_ATH9K_DEBUGFS
+#ifdef CPTCFG_ATH9K_DEBUGFS
 
 /**
  * struct ath_interrupt_stats - Contains statistics about interrupts
@@ -308,9 +310,9 @@ ath9k_debug_sync_cause(struct ath_softc *sc, u32 sync_cause)
 {
 }
 
-#endif /* CONFIG_ATH9K_DEBUGFS */
+#endif /* CPTCFG_ATH9K_DEBUGFS */
 
-#ifdef CONFIG_ATH9K_STATION_STATISTICS
+#ifdef CPTCFG_ATH9K_STATION_STATISTICS
 void ath_debug_rate_stats(struct ath_softc *sc,
 			  struct ath_rx_status *rs,
 			  struct sk_buff *skb);
@@ -320,6 +322,6 @@ static inline void ath_debug_rate_stats(struct ath_softc *sc,
 					struct sk_buff *skb)
 {
 }
-#endif /* CONFIG_ATH9K_STATION_STATISTICS */
+#endif /* CPTCFG_ATH9K_STATION_STATISTICS */
 
 #endif /* DEBUG_H */

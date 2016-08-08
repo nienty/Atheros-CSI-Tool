@@ -926,19 +926,18 @@ static int ar9003_hw_process_ini(struct ath_hw *ah,
 		 */
 		if ((ar9003_hw_get_rx_gain_idx(ah) == 2) ||
 		    (ar9003_hw_get_rx_gain_idx(ah) == 3)) {
-			REG_WRITE_ARRAY(&ah->ini_modes_rxgain_5g_xlna,
+			REG_WRITE_ARRAY(&ah->ini_modes_rxgain_xlna,
 					modesIndex, regWrites);
 		}
-
-		if (AR_SREV_9561(ah) && (ar9003_hw_get_rx_gain_idx(ah) == 0))
-			REG_WRITE_ARRAY(&ah->ini_modes_rxgain_5g_xlna,
-					modesIndex, regWrites);
 	}
 
 	if (AR_SREV_9550(ah) || AR_SREV_9561(ah))
 		REG_WRITE_ARRAY(&ah->ini_modes_rx_gain_bounds, modesIndex,
 				regWrites);
 
+	if (AR_SREV_9561(ah) && (ar9003_hw_get_rx_gain_idx(ah) == 0))
+		REG_WRITE_ARRAY(&ah->ini_modes_rxgain_xlna,
+				modesIndex, regWrites);
 	/*
 	 * TXGAIN initvals.
 	 */
@@ -1574,7 +1573,7 @@ static void ar9003_hw_antdiv_comb_conf_set(struct ath_hw *ah,
 	REG_WRITE(ah, AR_PHY_MC_GAIN_CTRL, regval);
 }
 
-#ifdef CONFIG_ATH9K_BTCOEX_SUPPORT
+#ifdef CPTCFG_ATH9K_BTCOEX_SUPPORT
 
 static void ar9003_hw_set_bt_ant_diversity(struct ath_hw *ah, bool enable)
 {
@@ -2041,7 +2040,7 @@ void ar9003_hw_attach_phy_ops(struct ath_hw *ah)
 	ops->spectral_scan_trigger = ar9003_hw_spectral_scan_trigger;
 	ops->spectral_scan_wait = ar9003_hw_spectral_scan_wait;
 
-#ifdef CONFIG_ATH9K_BTCOEX_SUPPORT
+#ifdef CPTCFG_ATH9K_BTCOEX_SUPPORT
 	ops->set_bt_ant_diversity = ar9003_hw_set_bt_ant_diversity;
 #endif
 	ops->tx99_start = ar9003_hw_tx99_start;
