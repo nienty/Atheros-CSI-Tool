@@ -279,7 +279,6 @@ static void ath9k_hw_read_revisions(struct ath_hw *ah)
 		return;
 	case AR9300_DEVID_QCA956X:
 		ah->hw_version.macVersion = AR_SREV_VERSION_9561;
-		return;
 	}
 
 	val = REG_READ(ah, AR_SREV) & AR_SREV_ID;
@@ -385,7 +384,7 @@ static void ath9k_hw_init_config(struct ath_hw *ah)
 
 	ah->config.dma_beacon_response_time = 1;
 	ah->config.sw_beacon_response_time = 6;
-	ah->config.cwm_ignore_extcca = false;
+	ah->config.cwm_ignore_extcca = 0;
 	ah->config.analog_shiftreg = 1;
 
 	ah->config.rx_intr_mitigation = true;
@@ -1241,7 +1240,6 @@ static void ath9k_hw_set_operating_mode(struct ath_hw *ah, int opmode)
 			break;
 		}
 		/* fall through */
-	case NL80211_IFTYPE_OCB:
 	case NL80211_IFTYPE_MESH_POINT:
 	case NL80211_IFTYPE_AP:
 		set |= AR_STA_ID1_STA_AP;
@@ -2299,10 +2297,10 @@ void ath9k_hw_set_sta_beacon_timers(struct ath_hw *ah,
 	else
 		nextTbtt = bs->bs_nexttbtt;
 
-	ath_dbg(common, BEACON, "next DTIM %u\n", bs->bs_nextdtim);
-	ath_dbg(common, BEACON, "next beacon %u\n", nextTbtt);
-	ath_dbg(common, BEACON, "beacon period %u\n", beaconintval);
-	ath_dbg(common, BEACON, "DTIM period %u\n", dtimperiod);
+	ath_dbg(common, BEACON, "next DTIM %d\n", bs->bs_nextdtim);
+	ath_dbg(common, BEACON, "next beacon %d\n", nextTbtt);
+	ath_dbg(common, BEACON, "beacon period %d\n", beaconintval);
+	ath_dbg(common, BEACON, "DTIM period %d\n", dtimperiod);
 
 	ENABLE_REGWRITE_BUFFER(ah);
 
@@ -2488,7 +2486,7 @@ int ath9k_hw_fill_cap_info(struct ath_hw *ah)
 	else
 		pCap->rts_aggr_limit = (8 * 1024);
 
-#ifdef CPTCFG_ATH9K_RFKILL
+#ifdef CONFIG_ATH9K_RFKILL
 	ah->rfsilent = ah->eep_ops->get_eeprom(ah, EEP_RF_SILENT);
 	if (ah->rfsilent & EEP_RFSILENT_ENABLED) {
 		ah->rfkill_gpio =
@@ -2588,7 +2586,7 @@ int ath9k_hw_fill_cap_info(struct ath_hw *ah)
 	    ah->eep_ops->get_eeprom(ah, EEP_PAPRD))
 			pCap->hw_caps |= ATH9K_HW_CAP_PAPRD;
 
-#ifdef CPTCFG_ATH9K_WOW
+#ifdef CONFIG_ATH9K_WOW
 	if (AR_SREV_9462_20_OR_LATER(ah) || AR_SREV_9565_11_OR_LATER(ah))
 		ah->wow.max_patterns = MAX_NUM_PATTERN;
 	else
@@ -2760,6 +2758,9 @@ void ath9k_hw_setrxfilter(struct ath_hw *ah, u32 bits)
 	u32 phybits;
 
 	ENABLE_REGWRITE_BUFFER(ah);
+
+	if (AR_SREV_9462(ah) || AR_SREV_9565(ah))
+		bits |= ATH9K_RX_FILTER_CONTROL_WRAPPER;
 
 	REG_WRITE(ah, AR_RX_FILTER, bits);
 
@@ -3184,7 +3185,6 @@ static struct {
 	{ AR_SREV_VERSION_9550,         "9550" },
 	{ AR_SREV_VERSION_9565,         "9565" },
 	{ AR_SREV_VERSION_9531,         "9531" },
-	{ AR_SREV_VERSION_9561,         "9561" },
 };
 
 /* For devices with external radios */
